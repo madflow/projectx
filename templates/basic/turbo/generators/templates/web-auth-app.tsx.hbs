@@ -8,7 +8,9 @@ import {
 } from "@repo/auth/react";
 import { Login01, type LoginValues } from "@repo/ui/features/login-01";
 import { Signup01, type SignupValues } from "@repo/ui/features/signup-01";
+import { Button } from "@repo/ui/components/button";
 import { useState } from "react";
+import { ThemeToggle } from "./components/theme-toggle";
 
 const client = createAuthClient();
 
@@ -37,23 +39,25 @@ function AuthContent() {
 
   if (isPending)
     return (
-      <main className="auth-page">
+      <main className="flex min-h-svh flex-col items-center justify-center gap-6 p-6">
+        <ThemeToggle />
         <p>Checking your session…</p>
       </main>
     );
 
   if (session) {
     return (
-      <main className="auth-page">
-        <div className="auth-session">
+      <main className="flex min-h-svh flex-col items-center justify-center gap-6 p-6">
+        <ThemeToggle />
+        <div className="flex flex-col items-center gap-4 text-center">
           <p>Signed in as {session.user.email}</p>
-          <button
+          <Button
             type="button"
             disabled={signOut.isPending}
             onClick={() => void signOut.execute().catch(() => {})}
           >
             Sign out
-          </button>
+          </Button>
           {signOut.error && <p role="alert">{signOut.error.message}</p>}
         </div>
       </main>
@@ -61,14 +65,15 @@ function AuthContent() {
   }
 
   return (
-    <main className="auth-page">
-      <div className="auth-switch" aria-label="Authentication">
-        <button type="button" aria-pressed={!register} onClick={() => setRegister(false)}>
+    <main className="flex min-h-svh flex-col items-center justify-center gap-6 p-6">
+      <ThemeToggle />
+      <div className="flex gap-2" aria-label="Authentication">
+        <Button type="button" variant={register ? "outline" : "default"} aria-pressed={!register} onClick={() => setRegister(false)}>
           Sign in
-        </button>
-        <button type="button" aria-pressed={register} onClick={() => setRegister(true)}>
+        </Button>
+        <Button type="button" variant={register ? "default" : "outline"} aria-pressed={register} onClick={() => setRegister(true)}>
           Create account
-        </button>
+        </Button>
       </div>
       {sessionError && <p role="alert">{sessionError.message}</p>}
       {register ? (

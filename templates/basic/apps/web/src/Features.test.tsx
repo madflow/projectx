@@ -1,6 +1,8 @@
 import { Login01 } from "@repo/ui/features/login-01";
 import { Signup01 } from "@repo/ui/features/signup-01";
 import { Sidebar07, Sidebar07Item } from "@repo/ui/features/sidebar-07";
+import { ThemeProvider } from "./components/theme-provider";
+import { ThemeToggle } from "./components/theme-toggle";
 import { expect, test, vi } from "vitest";
 import { render } from "vitest-browser-react";
 
@@ -25,12 +27,46 @@ test("signup form rejects mismatched passwords", async () => {
   expect(onSubmit).not.toHaveBeenCalled();
 });
 
-test("sidebar can collapse without sample navigation", async () => {
+test("sidebar toggles without sample navigation", async () => {
   const screen = await render(
     <Sidebar07 navigation={<Sidebar07Item icon={<span>•</span>} label="Home" href="/" />}>
       Content
     </Sidebar07>,
   );
-  await screen.getByRole("button", { name: "Collapse sidebar" }).click();
-  await expect.element(screen.getByRole("button", { name: "Expand sidebar" })).toBeVisible();
+  const toggle = screen.getByRole("button", { name: /^(Collapse|Expand) sidebar$/ });
+  const original = document
+    .querySelector('[data-slot="sidebar-trigger"]')
+    ?.getAttribute("aria-expanded");
+  await toggle.click();
+  if (original === "false") {
+    await expect.element(screen.getByRole("dialog", { name: "Sidebar" })).toBeVisible();
+  } else {
+    await expect.element(toggle).toHaveAttribute("aria-expanded", "false");
+  }
+});
+
+test("theme control switches between dark, light, and system", async () => {
+  const screen = await render(
+    <ThemeProvider defaultTheme="light" storageKey="projectx-theme-test">
+      <ThemeToggle />
+    </ThemeProvider>,
+  );
+
+  await screen.getByRole("button", { name: "dark theme" }).click();
+  await expect
+    .element(screen.getByRole("button", { name: "dark theme" }))
+    .toHaveAttribute("aria-pressed", "true");
+  expect(document.documentElement.classList.contains("dark")).toBe(true);
+
+  await screen.getByRole("button", { name: "light theme" }).click();
+  expect(document.documentElement.classList.contains("light")).toBe(true);
+
+  await screen.getByRole("button", { name: "system theme" }).click();
+  await expect
+    .element(screen.getByRole("button", { name: "system theme" }))
+    .toHaveAttribute("aria-pressed", "true");
+  expect(
+    document.documentElement.classList.contains("dark") ||
+      document.documentElement.classList.contains("light"),
+  ).toBe(true);
 });

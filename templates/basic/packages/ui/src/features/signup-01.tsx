@@ -1,7 +1,23 @@
 "use client";
 
+import { Button } from "@repo/ui/components/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@repo/ui/components/card";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@repo/ui/components/field";
+import { Input } from "@repo/ui/components/input";
+import { cn } from "@repo/ui/lib/utils";
 import { useId, useState, type FormEvent } from "react";
-import "./features.css";
 
 export type SignupValues = { name: string; email: string; password: string };
 
@@ -34,81 +50,83 @@ export function Signup01({
   }
 
   return (
-    <div className={`ui-feature-auth ${className ?? ""}`}>
-      <div className="ui-feature-card">
-        <div className="ui-feature-card-header">
-          <h2>Create an account</h2>
-          <p>Enter your information below to create your account</p>
-        </div>
-        <form className="ui-feature-form" onSubmit={submit}>
-          <div className="ui-feature-field">
-            <label htmlFor={`${id}-name`}>Full Name</label>
-            <input
-              id={`${id}-name`}
-              name="name"
-              type="text"
-              placeholder="John Doe"
-              autoComplete="name"
-              required
-              disabled={pending}
-            />
-          </div>
-          <div className="ui-feature-field">
-            <label htmlFor={`${id}-email`}>Email</label>
-            <input
-              id={`${id}-email`}
-              name="email"
-              type="email"
-              placeholder="m@example.com"
-              autoComplete="email"
-              required
-              disabled={pending}
-            />
-            <p>
-              We&apos;ll use this to contact you. We will not share your email with anyone else.
-            </p>
-          </div>
-          <div className="ui-feature-field">
-            <label htmlFor={`${id}-password`}>Password</label>
-            <input
-              id={`${id}-password`}
-              name="password"
-              type="password"
-              autoComplete="new-password"
-              minLength={8}
-              required
-              disabled={pending}
-            />
-            <p>Must be at least 8 characters long.</p>
-          </div>
-          <div className="ui-feature-field">
-            <label htmlFor={`${id}-confirm`}>Confirm Password</label>
-            <input
-              id={`${id}-confirm`}
-              name="confirm-password"
-              type="password"
-              autoComplete="new-password"
-              minLength={8}
-              required
-              disabled={pending}
-              onChange={() => setValidationError(null)}
-            />
-          </div>
-          {(validationError || error) && (
-            <p className="ui-feature-error" role="alert">
-              {validationError || error}
-            </p>
-          )}
-          <button className="ui-feature-primary" type="submit" disabled={pending}>
-            Create Account
-          </button>
-          {loginHref && (
-            <p className="ui-feature-hint">
-              Already have an account? <a href={loginHref}>Sign in</a>
-            </p>
-          )}
+    <Card className={cn("w-full max-w-sm", className)}>
+      <CardHeader>
+        <CardTitle>Create an account</CardTitle>
+        <CardDescription>Enter your information below to create your account</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={submit}>
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor={`${id}-name`}>Full Name</FieldLabel>
+              <Input
+                id={`${id}-name`}
+                name="name"
+                type="text"
+                placeholder="John Doe"
+                autoComplete="name"
+                required
+                disabled={pending}
+              />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor={`${id}-email`}>Email</FieldLabel>
+              <Input
+                id={`${id}-email`}
+                name="email"
+                type="email"
+                placeholder="m@example.com"
+                autoComplete="email"
+                required
+                disabled={pending}
+              />
+              <FieldDescription>
+                We&apos;ll use this to contact you. We will not share your email with anyone else.
+              </FieldDescription>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor={`${id}-password`}>Password</FieldLabel>
+              <Input
+                id={`${id}-password`}
+                name="password"
+                type="password"
+                autoComplete="new-password"
+                minLength={8}
+                required
+                disabled={pending}
+              />
+              <FieldDescription>Must be at least 8 characters long.</FieldDescription>
+            </Field>
+            <Field data-invalid={!!validationError}>
+              <FieldLabel htmlFor={`${id}-confirm`}>Confirm Password</FieldLabel>
+              <Input
+                id={`${id}-confirm`}
+                name="confirm-password"
+                type="password"
+                autoComplete="new-password"
+                minLength={8}
+                required
+                disabled={pending}
+                aria-invalid={!!validationError}
+                onChange={() => setValidationError(null)}
+              />
+              <FieldDescription>Please confirm your password.</FieldDescription>
+            </Field>
+            <Field>
+              {(validationError || error) && <FieldError>{validationError || error}</FieldError>}
+              <Button type="submit" disabled={pending}>
+                Create Account
+              </Button>
+              {loginHref && (
+                <FieldDescription className="px-6 text-center">
+                  Already have an account? <a href={loginHref}>Sign in</a>
+                </FieldDescription>
+              )}
+            </Field>
+          </FieldGroup>
         </form>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

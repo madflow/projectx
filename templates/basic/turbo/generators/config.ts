@@ -44,11 +44,18 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
           "API package, host, or web auth app already exists; refusing to overwrite it.",
         );
       }
-      const starterApp = `export default function App() {
+      const starterApp = `import { Button } from "@repo/ui/components/button";
+import { ThemeToggle } from "./components/theme-toggle";
+
+export default function App() {
   return (
-    <main className="starter-page">
-      <h1>ProjectX</h1>
-      <p>Run the database and auth generators to add sign-in and signup.</p>
+    <main className="flex min-h-svh flex-col gap-6 p-6">
+      <ThemeToggle />
+      <div className="flex max-w-md flex-col gap-4 text-sm leading-loose">
+        <h1 className="font-medium">ProjectX</h1>
+        <p>Run the database and auth generators to add sign-in and signup.</p>
+        <Button>Button</Button>
+      </div>
     </main>
   );
 }`;
@@ -104,9 +111,9 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
         {
           type: "modify" as const,
           path: "apps/web/vite.config.ts",
-          pattern: /  plugins: \[react\(\)\],/,
+          pattern: /  plugins: \[react\(\), tailwindcss\(\)\],/,
           template:
-            '  plugins: [react()],\n  server: { proxy: { "/api": "http://localhost:3000" } },',
+            '  plugins: [react(), tailwindcss()],\n  server: { proxy: { "/api": "http://localhost:3000" } },',
         },
       ];
     },

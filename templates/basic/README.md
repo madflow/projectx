@@ -3,7 +3,7 @@
 This pnpm workspace contains:
 
 - `apps/web`: a Vite app using React and TypeScript
-- `packages/ui`: shared React components
+- `packages/ui`: shared shadcn/ui components, Tailwind styles, and React feature blocks
 - `packages/typescript-config`: shared TypeScript configurations
 
 ## AI-assisted installation
@@ -19,6 +19,10 @@ The same instructions are available in [llm.txt](llm.txt). Manual steps are belo
 ## Develop
 
 Install dependencies with `pnpm install`, then run `pnpm dev`. Open http://localhost:5173.
+
+The web app imports `@repo/ui/globals.css`, which supplies Tailwind v4, the neutral shadcn theme, Figtree, and shared light/dark tokens. Use the theme control in the app to select light, dark, or system mode (or press `d` outside an editable field to toggle light/dark). The selection is saved in local storage and follows system preference when set to system.
+
+To add shared shadcn components, run `pnpm dlx shadcn@latest add <component> -c apps/web` from this directory. The app and UI package `components.json` files point to `packages/ui/src/styles/globals.css` and route shared components to `packages/ui/src/components`; import them as `@repo/ui/components/<component>`. Add dependencies required by new components to `packages/ui/package.json`.
 
 ## Validate and build
 
@@ -48,7 +52,7 @@ The PostgreSQL 18 image mounts its volume at `/var/lib/postgresql` rather than `
 
 ## UI feature blocks
 
-`@repo/ui` exports styled, framework-neutral blocks at `@repo/ui/features/login-01`, `@repo/ui/features/signup-01`, and `@repo/ui/features/sidebar-07`. The login and signup forms require an `onSubmit` callback and accept optional `pending`, `error`, and navigation-link props; wire them to `@repo/auth/react` in the consuming app. `Sidebar07` accepts `navigation`, `header`, `footer`, and page `children`; use `Sidebar07Item` for icon-collapsing links. These blocks do not create routes, supply sample data, or enable social login.
+`@repo/ui` exports styled, framework-neutral blocks at `@repo/ui/features/login-01`, `@repo/ui/features/signup-01`, and `@repo/ui/features/sidebar-07`. The blocks adapt the upstream shadcn `base-lyra` layouts with unmodified shadcn primitives in `packages/ui/src/components/`, using Tailwind classes instead of a separate feature stylesheet. The login and signup forms require an `onSubmit` callback and accept optional `pending`, `error`, and navigation-link props; wire them to `@repo/auth/react` in the consuming app. `Sidebar07` accepts `navigation`, `header`, `footer`, and page `children`; use `Sidebar07Item` for icon-collapsing links. It uses the shadcn sidebar's mobile sheet and remembers desktop collapse state in a cookie. These blocks do not create routes, supply sample data, or enable social login.
 
 ## Optional authentication
 
