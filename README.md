@@ -1,42 +1,29 @@
 # Turbo starters
 
-One self-contained Turborepo starter lives in `templates/basic`. Each template is its own pnpm workspace; the repository root is only the scaffolding CLI.
+Each directory under `templates/` is a self-contained Turborepo. `templates/basic` is the current Vite/React starter. Requires Node 24+ and pnpm 12; the optional PostgreSQL feature also requires Docker Compose.
 
-Requires Node 24+, pnpm 12, and (for the optional database) Docker Compose.
+## Test a template locally
+
+From this repository's root, copy the template to a scratch directory so generator output does not change the source template:
 
 ```sh
+test_dir=$(mktemp -d)
+rsync -a --exclude=node_modules --exclude=.turbo --exclude=dist templates/basic/ "$test_dir/"
+cd "$test_dir"
 pnpm install
-pnpm run create --template basic my-app
-# Or test any local template directory without pushing to GitHub:
-pnpm run create --template-path ./templates/basic my-app
+pnpm check
+pnpm build
 ```
 
-The CLI asks whether to add PostgreSQL and Drizzle ORM while creating a project. Choose **yes** to run the template's Turborepo/Plop generator; the CLI installs dependencies before and after generation. Choose **no** to copy the base starter without installing. Use `--database` or `--no-database` to skip the question in scripts. Run `pnpm run create` without arguments to also choose a template and project name interactively. The destination must not already exist. The CLI copies dotfiles, but excludes dependency folders, caches, build outputs, and repository metadata.
+Test the optional PostgreSQL and Drizzle ORM generator in the scratch copy:
 
 ```sh
-cd my-app
-pnpm install # only needed if you chose no
-pnpm dev
+pnpm turbo gen database          # answer yes to add it, or no to leave the template unchanged
+pnpm install                     # after choosing yes, install the new db workspace dependencies
+cp .env.example .env             # after choosing yes
+docker compose config            # check the generated Compose configuration
 ```
 
-### Optional PostgreSQL
+The generator adds no schema or sample tables. To exercise migrations, define your own tables in `packages/db/src/schema/*.ts`, start PostgreSQL with `docker compose up -d`, then run `pnpm --filter @repo/db db:generate` and `pnpm --filter @repo/db db:migrate`. See `templates/basic/README.md` for template details.
 
-Choosing **yes** while creating the project adds `compose.yaml`, `.env.example`, and a `packages/db` workspace with Drizzle ORM. No schema or sample tables are generated. Then:
-
-```sh
-cp .env.example .env
-docker compose up -d
-```
-
-If you chose no but change your mind later, run `pnpm turbo gen database` inside the project, then `pnpm install`.
-
-Define your own tables in `packages/db/src/schema/*.ts`, then generate and apply migrations:
-
-```sh
-pnpm --filter @repo/db db:generate
-pnpm --filter @repo/db db:migrate
-```
-
-`DATABASE_URL` is read from the root `.env` by Drizzle Kit. Server-side code importing `@repo/db` must supply `DATABASE_URL` in its environment; the Vite browser app does not connect to PostgreSQL directly.
-
-At this repository root, `pnpm test` checks the CLI and `pnpm check-types` checks its TypeScript. In a generated project, run `pnpm check` and `pnpm build`.
+`create-turbo --example` supports GitHub URLs, not local filesystem paths. The scratch-copy workflow tests unpublished changes without pushing to GitHub.
