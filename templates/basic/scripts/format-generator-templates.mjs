@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -33,8 +33,17 @@ for (const name of readdirSync(templates).filter((name) => /\.[cm]?[jt]sx?\.hbs$
 
 const generator = readFileSync(join(root, "turbo/generators/config.ts"), "utf8");
 const starterApp = generator.match(/const starterApp = `([\s\S]*?)`;/)?.[1];
-if (!starterApp || starterApp !== readFileSync(join(root, "apps/web/src/App.tsx"), "utf8").trim()) {
-  console.error("Auth generator starterApp does not match apps/web/src/App.tsx");
+const authAppExists = existsSync(join(root, "apps/web/src/AuthApp.tsx"));
+const expectedApp = authAppExists ? 'export { default } from "./AuthApp";' : starterApp;
+if (
+  !starterApp ||
+  expectedApp !== readFileSync(join(root, "apps/web/src/App.tsx"), "utf8").trim()
+) {
+  console.error(
+    authAppExists
+      ? "Auth generator App.tsx re-export does not match apps/web/src/App.tsx"
+      : "Auth generator starterApp does not match apps/web/src/App.tsx",
+  );
   failed = true;
 }
 
