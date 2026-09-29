@@ -16,7 +16,7 @@
     "db:generate": "pnpm --filter @repo/db db:generate",
     "db:migrate": "pnpm --filter @repo/db db:migrate",
     "db:studio": "pnpm --filter @repo/db db:studio",
-    "check": "pnpm lint && pnpm check-types && pnpm test && pnpm format:check"
+    "check": "node scripts/check-auth-schema.mjs && pnpm lint && pnpm check-types && pnpm test && pnpm format:check"
   },
   "devDependencies": {
     "@turbo/gen": "2.11.5",

@@ -4,9 +4,9 @@ Set up the Vite/React web app, PostgreSQL, Better Auth, and the API. Follow the 
 
 1. Check prerequisites: Node.js 24+, pnpm 12, and Docker Compose with a running Docker engine. If the project does not yet exist, create it with:
 
-   pnpm dlx create-turbo@latest <project-name> --example https://github.com/madflow/projectx/tree/main/templates/basic
+   pnpm dlx create-turbo@latest <project-name> --example https://github.com/madflow/projectx/tree/main/templates/basic --package-manager pnpm
 
-   Change into the new project directory. `create-turbo` copies the example but does not run its generators. If a project was already created, use that project instead of creating another one.
+   `--package-manager pnpm` avoids an interactive selection prompt in non-interactive shells. Change into the new project directory and run `pnpm pkg set name=<project-name>` to update the root `package.json` name: `create-turbo` leaves it as `my-turborepo`. Use the same name the user chose for the new directory. `create-turbo` copies the example but does not run its generators. If a project was already created, use that project instead of creating another one; check its root package name and rename it if needed.
 
 2. Install the starter dependencies if create-turbo did not already do so, then add the optional database and auth/API workspaces in order:
 
@@ -15,7 +15,7 @@ Set up the Vite/React web app, PostgreSQL, Better Auth, and the API. Follow the 
    pnpm turbo gen auth
    pnpm install
 
-   The database generator creates `packages/db`, `compose.yaml`, and `.env.example`. The auth generator adds `packages/auth`, `packages/api`, `apps/api`, the login UI, and the auth variables in `.env.example`. Neither generator needs a yes/no confirmation. Do not rerun them over workspaces that already exist.
+   The database generator creates `packages/db`, `compose.yaml`, and `.env.example`. The auth generator adds `packages/auth`, `packages/api`, `apps/api`, the login UI, and the auth variables in `.env.example`. Neither generator needs a yes/no confirmation. Do not rerun them over workspaces that already exist. Do not run `pnpm check` yet: auth imports `@repo/db/schema/auth`, which does not exist until step 4 generates it.
 
 3. Set up the local environment only after both generators:
 
@@ -28,7 +28,7 @@ Set up the Vite/React web app, PostgreSQL, Better Auth, and the API. Follow the 
    pnpm auth:generate-schema
    pnpm db:generate
 
-   `packages/auth/src/schema.config.ts` is the source of truth for auth options and schema-affecting plugins. Better Auth 1.7.6 generates `packages/db/src/schema/auth.ts` with plural table names, UUID IDs, PostgreSQL `gen_random_uuid()` defaults, and relations for joins. `pnpm db:generate` creates SQL migrations under `packages/db/drizzle/` from all `packages/db/src/schema/*.ts` files. Review generated migrations before applying them, especially if this is not a fresh database. Do not hand-edit the generated auth schema; regeneration replaces it.
+   `packages/auth/src/schema.config.ts` is the source of truth for auth options and schema-affecting plugins. Better Auth 1.7.6 generates `packages/db/src/schema/auth.ts` with plural table names, UUID IDs, PostgreSQL `gen_random_uuid()` defaults, and relations for joins. Generate this schema before running `pnpm check`; it needs the root `.env` from step 3, but not a running database. `pnpm db:generate` creates SQL migrations under `packages/db/drizzle/` from all `packages/db/src/schema/*.ts` files. Review generated migrations before applying them, especially if this is not a fresh database. Do not hand-edit the generated auth schema; regeneration replaces it.
 
 5. Start PostgreSQL, wait for it to be healthy, and apply migrations:
 

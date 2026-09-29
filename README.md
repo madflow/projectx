@@ -4,10 +4,10 @@ Each directory under `templates/` is a self-contained Turborepo. `templates/basi
 
 ## Install the full starter with an AI assistant
 
-Copy this prompt and replace `<project-name>` with your desired directory name:
+Copy this prompt into your AI assistant:
 
 ```text
-Set up a new project named <project-name> with the web app, PostgreSQL, Better Auth, and API from https://github.com/madflow/projectx/tree/main/templates/basic. Follow the installation instructions at https://raw.githubusercontent.com/madflow/projectx/main/templates/basic/llm.txt (also included as llm.txt in the generated project). Run the generators, install dependencies, set up the local environment and database, generate and apply migrations, and verify the app. Do not overwrite existing files or expose secrets. Tell me about any step you cannot complete.
+Ask me what to name the project and wait for my answer before starting. Then set up a new project with that name, including the web app, PostgreSQL, Better Auth, and API from https://github.com/madflow/projectx/tree/main/templates/basic. Follow the installation instructions at https://raw.githubusercontent.com/madflow/projectx/main/templates/basic/llm.txt (also included as llm.txt in the generated project). Run the generators, install dependencies, set up the local environment and database, generate and apply migrations, and verify the app. Do not overwrite existing files or expose secrets. Tell me about any step you cannot complete.
 ```
 
 The [installation instructions](templates/basic/llm.txt) are included in every project created from this template. `create-turbo --example` only copies the template; database and auth are added afterward by generators.
