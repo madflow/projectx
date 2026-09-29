@@ -11,23 +11,24 @@ pnpm run create --template basic my-app
 pnpm run create --template-path ./templates/basic my-app
 ```
 
-Run `pnpm run create` without arguments to choose a template and project name interactively. The destination must not already exist. The CLI copies dotfiles, but excludes dependency folders, caches, build outputs, and repository metadata.
+The CLI asks whether to add PostgreSQL and Drizzle ORM while creating a project. Choose **yes** to run the template's Turborepo/Plop generator; the CLI installs dependencies before and after generation. Choose **no** to copy the base starter without installing. Use `--database` or `--no-database` to skip the question in scripts. Run `pnpm run create` without arguments to also choose a template and project name interactively. The destination must not already exist. The CLI copies dotfiles, but excludes dependency folders, caches, build outputs, and repository metadata.
 
 ```sh
 cd my-app
-pnpm install
+pnpm install # only needed if you chose no
 pnpm dev
 ```
 
 ### Optional PostgreSQL
 
-Run `pnpm turbo gen database` inside the created project. Answer **yes** to add `compose.yaml`, `.env.example`, and a `packages/db` workspace with Drizzle ORM; answer **no** to leave the project unchanged. No schema or sample tables are generated. Then:
+Choosing **yes** while creating the project adds `compose.yaml`, `.env.example`, and a `packages/db` workspace with Drizzle ORM. No schema or sample tables are generated. Then:
 
 ```sh
 cp .env.example .env
 docker compose up -d
-pnpm install
 ```
+
+If you chose no but change your mind later, run `pnpm turbo gen database` inside the project, then `pnpm install`.
 
 Define your own tables in `packages/db/src/schema/*.ts`, then generate and apply migrations:
 
