@@ -1,0 +1,50 @@
+import { OpenAPIHandler } from "@orpc/openapi/fetch";
+import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
+import { ORPCError, os } from "@orpc/server";
+import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
+import { auth } from "@repo/auth";
+import * as z from "zod";
+
+const base = os.$context<{ headers: Headers }>();
+
+const authorized = base.use(
+  base.middleware(async ({ context, next }) => {
+    const session = await auth.api.getSession({ headers: context.headers });
+    if (!session?.user || !session.session) throw new ORPCError("UNAUTHORIZED");
+    return next({ context: { user: session.user, session: session.session } });
+  }),
+);
+
+export const router = {
+  health: base
+    .route({ method: "GET", path: "/health" })
+    .output(z.object({ status: z.literal("ok") }))
+    .handler(() => ({ status: "ok" as const })),
+  me: authorized
+    .route({ method: "GET", path: "/me" })
+    .output(z.object({ id: z.string(), name: z.string(), email: z.email() }))
+    .handler(({ context }) => ({
+      id: context.user.id,
+      name: context.user.name,
+      email: context.user.email,
+    })),
+};
+
+const handler = new OpenAPIHandler(router, {
+  plugins: [
+    new OpenAPIReferencePlugin({
+      docsPath: "/docs",
+      specPath: "/openapi.json",
+      schemaConverters: [new ZodToJsonSchemaConverter()],
+      specGenerateOptions: { info: { title: "Starter API", version: "1.0.0" } },
+    }),
+  ],
+});
+
+// The host owns routing and passes the untouched Request (including cookies).
+export function handleApi(request: Request) {
+  return handler.handle(request, {
+    prefix: "/api/v1",
+    context: { headers: request.headers },
+  });
+}

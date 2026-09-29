@@ -1,0 +1,90 @@
+import {
+  AuthProvider,
+  createAuthClient,
+  useAuthSession,
+  useSignInEmail,
+  useSignOut,
+  useSignUpEmail,
+} from "@repo/auth/react";
+import { useState, type FormEvent } from "react";
+
+const client = createAuthClient();
+
+function AuthContent() {
+  const { data: session, isPending } = useAuthSession();
+  const signIn = useSignInEmail();
+  const signUp = useSignUpEmail();
+  const signOut = useSignOut();
+  const [register, setRegister] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (register) await signUp.execute({ name, email, password });
+    else await signIn.execute({ email, password });
+  }
+
+  if (isPending) return <p>Checking your session…</p>;
+  if (session) {
+    return (
+      <section>
+        <p>Signed in as {session.user.email}</p>
+        <button type="button" disabled={signOut.isPending} onClick={() => void signOut.execute()}>
+          Sign out
+        </button>
+        {signOut.error && <p role="alert">{signOut.error.message}</p>}
+      </section>
+    );
+  }
+
+  return (
+    <section>
+      <h2>{register ? "Create an account" : "Sign in"}</h2>
+      <form onSubmit={(event) => void submit(event)}>
+        {register && (
+          <label>
+            Name <input required value={name} onChange={(event) => setName(event.target.value)} />
+          </label>
+        )}
+        <label>
+          Email{" "}
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+          />
+        </label>
+        <label>
+          Password{" "}
+          <input
+            type="password"
+            required
+            minLength={8}
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+          />
+        </label>
+        <button type="submit" disabled={signIn.isPending || signUp.isPending}>
+          {register ? "Create account" : "Sign in"}
+        </button>
+        {(signIn.error || signUp.error) && (
+          <p role="alert">{(signIn.error || signUp.error)?.message}</p>
+        )}
+      </form>
+      <button type="button" onClick={() => setRegister(!register)}>
+        {register ? "Already have an account? Sign in" : "New here? Create an account"}
+      </button>
+    </section>
+  );
+}
+
+export function AuthDemo() {
+  return (
+    <AuthProvider client={client}>
+      <AuthContent />
+    </AuthProvider>
+  );
+}

@@ -1,0 +1,103 @@
+"use client";
+
+import { createAuthClient } from "better-auth/react";
+import {
+  createContext,
+  createElement,
+  useCallback,
+  useContext,
+  useState,
+  type ReactNode,
+} from "react";
+
+// This module never imports the database-backed server auth instance.
+export { createAuthClient };
+
+export type AuthClient = ReturnType<typeof createAuthClient>;
+
+const AuthContext = createContext<AuthClient | null>(null);
+
+export function AuthProvider({ client, children }: { client: AuthClient; children: ReactNode }) {
+  return createElement(AuthContext.Provider, { value: client }, children);
+}
+
+export function useAuthClient<TClient extends AuthClient = AuthClient>(): TClient {
+  const client = useContext(AuthContext);
+  if (!client) throw new Error("useAuthClient must be used inside AuthProvider");
+  return client as TClient;
+}
+
+export function useAuthSession() {
+  return useAuthClient().useSession();
+}
+
+// Returns the original Better Auth result, including its typed data and error.
+// Plugin actions can be captured from a typed useAuthClient() in the callback.
+export function useAuthAction<
+  TArgs extends unknown[],
+  TResult extends { error?: { message?: string } | null },
+>(action: (client: AuthClient, ...args: TArgs) => Promise<TResult>) {
+  const client = useAuthClient();
+  const [isPending, setIsPending] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const execute = useCallback(
+    async (...args: TArgs) => {
+      setIsPending(true);
+      setError(null);
+      try {
+        const result = await action(client, ...args);
+        if (result.error) setError(new Error(result.error.message ?? "Authentication failed"));
+        return result;
+      } catch (cause) {
+        setError(cause instanceof Error ? cause : new Error(String(cause)));
+        throw cause;
+      } finally {
+        setIsPending(false);
+      }
+    },
+    [action, client],
+  );
+
+  return { execute, isPending, error, clearError: () => setError(null) };
+}
+
+export function useSignInEmail() {
+  return useAuthAction((client, input: Parameters<AuthClient["signIn"]["email"]>[0]) =>
+    client.signIn.email(input),
+  );
+}
+
+export function useSignUpEmail() {
+  return useAuthAction((client, input: Parameters<AuthClient["signUp"]["email"]>[0]) =>
+    client.signUp.email(input),
+  );
+}
+
+export function useSignOut() {
+  return useAuthAction((client) => client.signOut());
+}
+
+export function useRequestPasswordReset() {
+  return useAuthAction((client, input: Parameters<AuthClient["requestPasswordReset"]>[0]) =>
+    client.requestPasswordReset(input),
+  );
+}
+
+export function useResetPassword() {
+  return useAuthAction((client, input: Parameters<AuthClient["resetPassword"]>[0]) =>
+    client.resetPassword(input),
+  );
+}
+
+export function useSendVerificationEmail() {
+  return useAuthAction((client, input: Parameters<AuthClient["sendVerificationEmail"]>[0]) =>
+    client.sendVerificationEmail(input),
+  );
+}
+
+export function useChangePassword() {
+  return useAuthAction((client, input: Parameters<AuthClient["changePassword"]>[0]) =>
+    client.changePassword(input),
+  );
+}

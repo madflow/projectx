@@ -1,0 +1,25 @@
+import { drizzleAdapter } from "@better-auth/drizzle-adapter";
+import { pool } from "@repo/db";
+import { account, session, user, verification } from "@repo/db/schema/auth";
+import { betterAuth, type BetterAuthPlugin } from "better-auth";
+import { drizzle } from "drizzle-orm/node-postgres";
+
+const schema = { accounts: account, sessions: session, users: user, verifications: verification };
+const db = drizzle(pool, { schema });
+
+// Keep framework-specific cookie plugins at the end of the plugins array.
+export function createAuth(plugins: BetterAuthPlugin[] = []) {
+  return betterAuth({
+    database: drizzleAdapter(db, { provider: "pg", schema }),
+    emailAndPassword: { enabled: true },
+    trustedOrigins: process.env.WEB_ORIGIN ? [process.env.WEB_ORIGIN] : [],
+    user: { modelName: "users" },
+    session: { modelName: "sessions" },
+    account: { modelName: "accounts" },
+    verification: { modelName: "verifications" },
+    advanced: { database: { generateId: false } },
+    plugins,
+  });
+}
+
+export const auth = createAuth();

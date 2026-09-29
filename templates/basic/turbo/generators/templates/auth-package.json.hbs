@@ -1,0 +1,28 @@
+{
+  "name": "@repo/auth",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./next": "./src/next.ts",
+    "./tanstack": "./src/tanstack.ts",
+    "./hono": "./src/hono.ts",
+    "./react": "./src/react.ts"
+  },
+  "scripts": {
+    "lint": "oxlint -c ../../.oxlintrc.json . --deny-warnings",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@better-auth/drizzle-adapter": "1.7.6",
+    "@repo/db": "workspace:*",
+    "better-auth": "1.7.6",
+    "drizzle-orm": "0.45.3",
+    "react": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.3",
+    "@types/react": "19.3.0",
+    "typescript": "7.0.2"
+  }
+}

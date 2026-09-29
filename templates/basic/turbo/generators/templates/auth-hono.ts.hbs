@@ -1,0 +1,4 @@
+import { auth } from "./index.js";
+
+// In a Hono app: app.all("/api/auth/*", (c) => honoAuthHandler(c.req.raw));
+export const honoAuthHandler = (request: Request) => auth.handler(request);
