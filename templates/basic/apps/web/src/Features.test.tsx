@@ -1,6 +1,6 @@
-import { Login01 } from "@repo/ui/features/login-01";
-import { Sidebar07, Sidebar07Item } from "@repo/ui/features/sidebar-07";
-import { Signup01 } from "@repo/ui/features/signup-01";
+import { LoginForm } from "@repo/ui/features/login-form";
+import { SidebarLayout, SidebarNavItem } from "@repo/ui/features/sidebar-layout";
+import { SignupForm } from "@repo/ui/features/signup-form";
 import { expect, test, vi } from "vitest";
 import { render } from "vitest-browser-react";
 
@@ -9,7 +9,7 @@ import { ThemeToggle } from "./components/theme-toggle";
 
 test("login form sends credentials to its consumer", async () => {
   const onSubmit = vi.fn();
-  const screen = await render(<Login01 onSubmit={onSubmit} />);
+  const screen = await render(<LoginForm onSubmit={onSubmit} />);
   await screen.getByRole("textbox", { name: "Email" }).fill("test@example.com");
   await screen.getByLabelText("Password").fill("password123");
   await screen.getByRole("button", { name: "Login" }).click();
@@ -21,7 +21,7 @@ test("login block exposes working links and an optional Google action", async ()
   const onForgotPasswordClick = vi.fn();
   const onGoogleLogin = vi.fn();
   const screen = await render(
-    <Login01
+    <LoginForm
       onSubmit={vi.fn()}
       onSignupClick={onSignupClick}
       onForgotPasswordClick={onForgotPasswordClick}
@@ -40,7 +40,7 @@ test("login block exposes working links and an optional Google action", async ()
 
 test("signup form rejects mismatched passwords", async () => {
   const onSubmit = vi.fn();
-  const screen = await render(<Signup01 onSubmit={onSubmit} />);
+  const screen = await render(<SignupForm onSubmit={onSubmit} />);
   await screen.getByRole("textbox", { name: "Full Name" }).fill("Test User");
   await screen.getByRole("textbox", { name: "Email" }).fill("test@example.com");
   await screen.getByLabelText("Password", { exact: true }).fill("password123");
@@ -52,9 +52,9 @@ test("signup form rejects mismatched passwords", async () => {
 
 test("sidebar toggles without sample navigation", async () => {
   const screen = await render(
-    <Sidebar07 navigation={<Sidebar07Item icon={<span>•</span>} label="Home" href="/" />}>
+    <SidebarLayout navigation={<SidebarNavItem icon={<span>•</span>} label="Home" href="/" />}>
       Content
-    </Sidebar07>,
+    </SidebarLayout>,
   );
   const toggle = screen.getByRole("button", { name: /^(Collapse|Expand) sidebar$/ });
   const original = document

@@ -18,7 +18,7 @@ import {
 import { TooltipProvider } from "@repo/ui/components/tooltip";
 import type { ReactNode } from "react";
 
-function Sidebar07Inset({ children }: { children: ReactNode }) {
+function SidebarLayoutInset({ children }: { children: ReactNode }) {
   const { isMobile, openMobile, state } = useSidebar();
   const expanded = isMobile ? openMobile : state === "expanded";
 
@@ -36,7 +36,7 @@ function Sidebar07Inset({ children }: { children: ReactNode }) {
   );
 }
 
-export function Sidebar07({
+export function SidebarLayout({
   children,
   header,
   footer,
@@ -64,13 +64,13 @@ export function Sidebar07({
           {footer && <SidebarFooter>{footer}</SidebarFooter>}
           <SidebarRail />
         </Sidebar>
-        <Sidebar07Inset>{children}</Sidebar07Inset>
+        <SidebarLayoutInset>{children}</SidebarLayoutInset>
       </SidebarProvider>
     </TooltipProvider>
   );
 }
 
-export function Sidebar07Item({
+export function SidebarNavItem({
   icon,
   label,
   href,

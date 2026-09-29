@@ -143,5 +143,3 @@ export function LoginForm({
     </div>
   );
 }
-
-export { LoginForm as Login01 };

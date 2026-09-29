@@ -20,7 +20,7 @@ import { useId, useState, type FormEvent } from "react";
 
 export type SignupValues = { name: string; email: string; password: string };
 
-export function Signup01({
+export function SignupForm({
   onSubmit,
   pending = false,
   error,
