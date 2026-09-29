@@ -1,5 +1,5 @@
 import type { PlopTypes } from "@turbo/gen";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 
 export default function generator(plop: PlopTypes.NodePlopAPI): void {
   plop.setGenerator("database", {
@@ -38,11 +38,22 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
       if (
         existsSync("packages/api") ||
         existsSync("apps/api") ||
-        existsSync("apps/web/src/AuthDemo.tsx")
+        existsSync("apps/web/src/AuthApp.tsx")
       ) {
         throw new Error(
-          "API package, host, or web auth UI already exists; refusing to overwrite it.",
+          "API package, host, or web auth app already exists; refusing to overwrite it.",
         );
+      }
+      const starterApp = `export default function App() {
+  return (
+    <main className="starter-page">
+      <h1>ProjectX</h1>
+      <p>Run the database and auth generators to add sign-in and signup.</p>
+    </main>
+  );
+}`;
+      if (readFileSync("apps/web/src/App.tsx", "utf8").trim() !== starterApp) {
+        throw new Error("Web app has been customized; refusing to replace it with the auth flow.");
       }
 
       const files = [
@@ -62,7 +73,7 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
         ["apps/api/turbo.json", "api-app-turbo.json.hbs"],
         ["apps/api/tsconfig.json", "api-app-tsconfig.json.hbs"],
         ["apps/api/src/index.ts", "api-app-index.ts.hbs"],
-        ["apps/web/src/AuthDemo.tsx", "web-auth-demo.tsx.hbs"],
+        ["apps/web/src/AuthApp.tsx", "web-auth-app.tsx.hbs"],
       ];
 
       return [
@@ -86,22 +97,16 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
         },
         {
           type: "modify" as const,
+          path: "apps/web/src/App.tsx",
+          pattern: /^[\s\S]*$/,
+          template: 'export { default } from "./AuthApp";\n',
+        },
+        {
+          type: "modify" as const,
           path: "apps/web/vite.config.ts",
           pattern: /  plugins: \[react\(\)\],/,
           template:
             '  plugins: [react()],\n  server: { proxy: { "/api": "http://localhost:3000" } },',
-        },
-        {
-          type: "modify" as const,
-          path: "apps/web/src/App.tsx",
-          pattern: /import \{ useState \} from "react";/,
-          template: 'import { useState } from "react";\nimport { AuthDemo } from "./AuthDemo";',
-        },
-        {
-          type: "modify" as const,
-          path: "apps/web/src/App.tsx",
-          pattern: /      <h1>Vite \+ React \+ TypeScript<\/h1>/,
-          template: "      <h1>Vite + React + TypeScript</h1>\n      <AuthDemo />",
         },
       ];
     },

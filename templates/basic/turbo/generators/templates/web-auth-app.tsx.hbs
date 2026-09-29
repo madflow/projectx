@@ -1,0 +1,89 @@
+import {
+  AuthProvider,
+  createAuthClient,
+  useAuthSession,
+  useSignInEmail,
+  useSignOut,
+  useSignUpEmail,
+} from "@repo/auth/react";
+import { Login01, type LoginValues } from "@repo/ui/features/login-01";
+import { Signup01, type SignupValues } from "@repo/ui/features/signup-01";
+import { useState } from "react";
+
+const client = createAuthClient();
+
+function AuthContent() {
+  const { data: session, isPending, error: sessionError } = useAuthSession();
+  const signIn = useSignInEmail();
+  const signUp = useSignUpEmail();
+  const signOut = useSignOut();
+  const [register, setRegister] = useState(false);
+
+  async function login(values: LoginValues) {
+    try {
+      await signIn.execute(values);
+    } catch {
+      // The hook exposes the error to the form.
+    }
+  }
+
+  async function signup(values: SignupValues) {
+    try {
+      await signUp.execute(values);
+    } catch {
+      // The hook exposes the error to the form.
+    }
+  }
+
+  if (isPending)
+    return (
+      <main className="auth-page">
+        <p>Checking your session…</p>
+      </main>
+    );
+
+  if (session) {
+    return (
+      <main className="auth-page">
+        <div className="auth-session">
+          <p>Signed in as {session.user.email}</p>
+          <button
+            type="button"
+            disabled={signOut.isPending}
+            onClick={() => void signOut.execute().catch(() => {})}
+          >
+            Sign out
+          </button>
+          {signOut.error && <p role="alert">{signOut.error.message}</p>}
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <main className="auth-page">
+      <div className="auth-switch" aria-label="Authentication">
+        <button type="button" aria-pressed={!register} onClick={() => setRegister(false)}>
+          Sign in
+        </button>
+        <button type="button" aria-pressed={register} onClick={() => setRegister(true)}>
+          Create account
+        </button>
+      </div>
+      {sessionError && <p role="alert">{sessionError.message}</p>}
+      {register ? (
+        <Signup01 onSubmit={signup} pending={signUp.isPending} error={signUp.error?.message} />
+      ) : (
+        <Login01 onSubmit={login} pending={signIn.isPending} error={signIn.error?.message} />
+      )}
+    </main>
+  );
+}
+
+export default function AuthApp() {
+  return (
+    <AuthProvider client={client}>
+      <AuthContent />
+    </AuthProvider>
+  );
+}

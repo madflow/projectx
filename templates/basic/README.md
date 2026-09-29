@@ -46,9 +46,13 @@ The database package is for server-side use and is not connected to the Vite bro
 
 The PostgreSQL 18 image mounts its volume at `/var/lib/postgresql` rather than `/var/lib/postgresql/data`. Changing the image tag **does not upgrade** an existing PostgreSQL 17 database. Back up the old database with `pg_dump`/`pg_dumpall` while PostgreSQL 17 is still running, retain the old volume, create a **new** PostgreSQL 18 volume (with a new name or Compose project), and restore the dump into PostgreSQL 18. Verify the restored data before removing the old volume. Never run `docker compose down -v` against a volume you want to keep. For large installations, follow the PostgreSQL `pg_upgrade` documentation instead.
 
+## UI feature blocks
+
+`@repo/ui` exports styled, framework-neutral blocks at `@repo/ui/features/login-01`, `@repo/ui/features/signup-01`, and `@repo/ui/features/sidebar-07`. The login and signup forms require an `onSubmit` callback and accept optional `pending`, `error`, and navigation-link props; wire them to `@repo/auth/react` in the consuming app. `Sidebar07` accepts `navigation`, `header`, `footer`, and page `children`; use `Sidebar07Item` for icon-collapsing links. These blocks do not create routes, supply sample data, or enable social login.
+
 ## Optional authentication
 
-To start with database, auth, API, and web, run the following from the project root. The auth generator refuses to run without the database package or overwrite existing auth/API packages and web auth UI.
+To start with database, auth, API, and web, run the following from the project root. The auth generator refuses to run without the database package, overwrite existing auth/API packages or auth UI, or replace a customized `apps/web/src/App.tsx`. It wires the reusable login/signup UI blocks to Better Auth in the web app.
 
 ```sh
 pnpm turbo gen database
@@ -79,11 +83,11 @@ Add schema-affecting Better Auth plugins to `authOptions.plugins` in `packages/a
 
 The Next.js and TanStack entry points install their respective server-action cookie plugins. `apps/api` mounts Better Auth at `/api/auth/*` and `@repo/api` at `/api/v1/*`. The API package exports an oRPC `OpenAPIHandler` with `/health` (public) and `/me` (session-required), plus generated OpenAPI documentation at `/api/v1/docs` and `/api/v1/openapi.json`. Add more REST procedures in `packages/api/src/index.ts`; keep login and signup on Better Auth's native endpoints.
 
-`apps/web` proxies `/api` to the host at `http://localhost:3000` in development and offers a minimal email/password login/signup form. Open http://localhost:5173 after starting `pnpm dev`. The same-origin proxy makes session cookies work without development CORS configuration; `WEB_ORIGIN=http://localhost:5173` allows Better Auth to accept browser requests from the Vite origin. In production, route `/api/*` to `apps/api` and serve the Vite build on the same origin (or explicitly configure cross-origin cookies and trusted origins). `apps/api` loads the root `.env` on startup; configure `BETTER_AUTH_URL=http://localhost:3000` for this local setup. If port 3000 is already in use, set `PORT` and `BETTER_AUTH_URL` for the API process and change the target in `apps/web/vite.config.ts` to match.
+After auth generation, `apps/web` shows email/password sign-in and signup forms, the active session, and sign-out. The generated `AuthApp.tsx` composes headless `@repo/auth/react` hooks with the `@repo/ui` blocks; it does not enable social login. The web app proxies `/api` to the host at `http://localhost:3000` in development. Open http://localhost:5173 after starting `pnpm dev`. The same-origin proxy makes session cookies work without development CORS configuration; `WEB_ORIGIN=http://localhost:5173` allows Better Auth to accept browser requests from the Vite origin. In production, route `/api/*` to `apps/api` and serve the Vite build on the same origin (or explicitly configure cross-origin cookies and trusted origins). `apps/api` loads the root `.env` on startup; configure `BETTER_AUTH_URL=http://localhost:3000` for this local setup. If port 3000 is already in use, set `PORT` and `BETTER_AUTH_URL` for the API process and change the target in `apps/web/vite.config.ts` to match.
 
 ### React UI integration
 
-`@repo/auth/react` is a **client-only, headless** entry point used by the generated web login UI. It provides `createAuthClient`, `AuthProvider`, `useAuthClient` (the full typed client, including configured plugin actions), `useAuthSession` (reactive session), and action hooks for email sign-in/up, sign-out, password reset, verification email, and password change. `useAuthAction` can wrap any other client action with pending and error state. The package does not define UI routes or import the database-backed server instance into browser code. Build other forms and route layouts in the consuming app.
+`@repo/auth/react` is a **client-only, headless** entry point. The generator adds `@repo/auth: workspace:*` to the web app's dependencies. It provides `createAuthClient`, `AuthProvider`, `useAuthClient` (the full typed client, including configured plugin actions), `useAuthSession` (reactive session), and action hooks for email sign-in/up, sign-out, password reset, verification email, and password change. `useAuthAction` can wrap any other client action with pending and error state. The package does not define UI routes or import the database-backed server instance into browser code. Build other forms and route layouts in the consuming app.
 
 ```tsx
 "use client";
