@@ -13,7 +13,9 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@base-ui/react": "^1.8.0",
     "@repo/ui": "workspace:*",
+    "lucide-react": "^1.48.0",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },

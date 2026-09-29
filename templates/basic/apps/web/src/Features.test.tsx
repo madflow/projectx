@@ -75,19 +75,25 @@ test("theme control switches between dark, light, and system", async () => {
     </ThemeProvider>,
   );
 
-  await screen.getByRole("button", { name: "dark theme" }).click();
-  await expect
-    .element(screen.getByRole("button", { name: "dark theme" }))
-    .toHaveAttribute("aria-pressed", "true");
+  const trigger = screen.getByRole("button", { name: "Choose theme" });
+  await trigger.click();
+  await screen.getByRole("menuitemradio", { name: "Dark" }).click();
+  await expect.element(trigger).toHaveAttribute("aria-expanded", "false");
   expect(document.documentElement.classList.contains("dark")).toBe(true);
 
-  await screen.getByRole("button", { name: "light theme" }).click();
+  await trigger.click();
+  await expect
+    .element(screen.getByRole("menuitemradio", { name: "Dark" }))
+    .toHaveAttribute("aria-checked", "true");
+  await screen.getByRole("menuitemradio", { name: "Light" }).click();
   expect(document.documentElement.classList.contains("light")).toBe(true);
 
-  await screen.getByRole("button", { name: "system theme" }).click();
+  await trigger.click();
+  await screen.getByRole("menuitemradio", { name: "System" }).click();
+  await trigger.click();
   await expect
-    .element(screen.getByRole("button", { name: "system theme" }))
-    .toHaveAttribute("aria-pressed", "true");
+    .element(screen.getByRole("menuitemradio", { name: "System" }))
+    .toHaveAttribute("aria-checked", "true");
   expect(
     document.documentElement.classList.contains("dark") ||
       document.documentElement.classList.contains("light"),
