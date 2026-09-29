@@ -20,7 +20,7 @@ The same instructions are available in [llm.txt](llm.txt). Manual steps are belo
 
 Install dependencies with `pnpm install`, then run `pnpm dev`. Open http://localhost:5173.
 
-The web app imports `@repo/ui/globals.css`, which supplies Tailwind v4, the neutral shadcn theme, Figtree, and shared light/dark tokens. Use the theme control in the app to select light, dark, or system mode (or press `d` outside an editable field to toggle light/dark). The selection is saved in local storage and follows system preference when set to system.
+The web app imports `@repo/ui/globals.css`, which supplies Tailwind v4, the neutral shadcn theme, Figtree, and shared light/dark tokens. Enabled buttons use a pointer cursor, as in the `buFyx8K` Vite monorepo preset. Use the theme control in the app to select light, dark, or system mode (or press `d` outside an editable field to toggle light/dark). The selection is saved in local storage and follows system preference when set to system.
 
 To add shared shadcn components, run `pnpm dlx shadcn@latest add <component> -c apps/web` from this directory. The app and UI package `components.json` files point to `packages/ui/src/styles/globals.css` and route shared components to `packages/ui/src/components`; import them as `@repo/ui/components/<component>`. Add dependencies required by new components to `packages/ui/package.json`.
 

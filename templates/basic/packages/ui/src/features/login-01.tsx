@@ -45,7 +45,7 @@ export function Login01({
   }
 
   return (
-    <div className={cn("flex w-full max-w-sm flex-col gap-6", className)}>
+    <div className={cn("flex flex-col gap-6", className)}>
       <Card>
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>

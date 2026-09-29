@@ -16,7 +16,6 @@ import {
   FieldLabel,
 } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
-import { cn } from "@repo/ui/lib/utils";
 import { useId, useState, type FormEvent } from "react";
 
 export type SignupValues = { name: string; email: string; password: string };
@@ -50,7 +49,7 @@ export function Signup01({
   }
 
   return (
-    <Card className={cn("w-full max-w-sm", className)}>
+    <Card className={className}>
       <CardHeader>
         <CardTitle>Create an account</CardTitle>
         <CardDescription>Enter your information below to create your account</CardDescription>

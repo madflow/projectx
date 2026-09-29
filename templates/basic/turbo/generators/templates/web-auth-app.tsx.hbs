@@ -68,19 +68,31 @@ function AuthContent() {
     <main className="flex min-h-svh flex-col items-center justify-center gap-6 p-6">
       <ThemeToggle />
       <div className="flex gap-2" aria-label="Authentication">
-        <Button type="button" variant={register ? "outline" : "default"} aria-pressed={!register} onClick={() => setRegister(false)}>
+        <Button
+          type="button"
+          variant={register ? "outline" : "default"}
+          aria-pressed={!register}
+          onClick={() => setRegister(false)}
+        >
           Sign in
         </Button>
-        <Button type="button" variant={register ? "default" : "outline"} aria-pressed={register} onClick={() => setRegister(true)}>
+        <Button
+          type="button"
+          variant={register ? "default" : "outline"}
+          aria-pressed={register}
+          onClick={() => setRegister(true)}
+        >
           Create account
         </Button>
       </div>
       {sessionError && <p role="alert">{sessionError.message}</p>}
-      {register ? (
-        <Signup01 onSubmit={signup} pending={signUp.isPending} error={signUp.error?.message} />
-      ) : (
-        <Login01 onSubmit={login} pending={signIn.isPending} error={signIn.error?.message} />
-      )}
+      <div className="w-full max-w-sm">
+        {register ? (
+          <Signup01 onSubmit={signup} pending={signUp.isPending} error={signUp.error?.message} />
+        ) : (
+          <Login01 onSubmit={login} pending={signIn.isPending} error={signIn.error?.message} />
+        )}
+      </div>
     </main>
   );
 }
