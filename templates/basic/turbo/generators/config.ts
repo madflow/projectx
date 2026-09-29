@@ -4,17 +4,8 @@ import { existsSync } from "node:fs";
 export default function generator(plop: PlopTypes.NodePlopAPI): void {
   plop.setGenerator("database", {
     description: "Optionally add local PostgreSQL 18 and Drizzle ORM",
-    prompts: [
-      {
-        type: "confirm",
-        name: "database",
-        message: "Add PostgreSQL and Drizzle ORM?",
-        default: true,
-      },
-    ],
-    actions: (answers) => {
-      if (!answers?.database) return ["Skipped database setup"];
-
+    prompts: [],
+    actions: () => {
       const files = [
         ["compose.yaml", "compose.yaml.hbs"],
         [".env.example", "env.example.hbs"],
@@ -59,11 +50,11 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
         ["packages/auth/turbo.json", "auth-turbo.json.hbs"],
         ["packages/auth/tsconfig.json", "auth-tsconfig.json.hbs"],
         ["packages/auth/src/index.ts", "auth-index.ts.hbs"],
+        ["packages/auth/src/schema.config.ts", "auth-schema-config.ts.hbs"],
         ["packages/auth/src/next.ts", "auth-next.ts.hbs"],
         ["packages/auth/src/tanstack.ts", "auth-tanstack.ts.hbs"],
         ["packages/auth/src/hono.ts", "auth-hono.ts.hbs"],
         ["packages/auth/src/react.ts", "auth-react.ts.hbs"],
-        ["packages/db/src/schema/auth.ts", "auth-schema.ts.hbs"],
         ["packages/api/package.json", "api-package.json.hbs"],
         ["packages/api/tsconfig.json", "api-tsconfig.json.hbs"],
         ["packages/api/src/index.ts", "api-index.ts.hbs"],

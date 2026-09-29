@@ -6,6 +6,16 @@ This pnpm workspace contains:
 - `packages/ui`: shared React components
 - `packages/typescript-config`: shared TypeScript configurations
 
+## AI-assisted installation
+
+For a complete setup with PostgreSQL, Better Auth, and the API, give your assistant this prompt:
+
+```text
+Set up this starter with PostgreSQL, Better Auth, and the API. Read and follow ./llm.txt (https://raw.githubusercontent.com/madflow/projectx/main/templates/basic/llm.txt). Do not overwrite existing files or expose secrets. Verify the app and report any steps you cannot complete.
+```
+
+The same instructions are available in [llm.txt](llm.txt). Manual steps are below.
+
 ## Develop
 
 Install dependencies with `pnpm install`, then run `pnpm dev`. Open http://localhost:5173.
@@ -20,14 +30,14 @@ The root scripts use Turborepo to run tasks across the workspace.
 
 ## Optional database
 
-Run `pnpm turbo gen database` and confirm to add local PostgreSQL 18 (Docker Compose) and a Drizzle ORM `packages/db` workspace. Declining makes no changes. No schema is provided: add your own tables in `packages/db/src/schema/*.ts` before generating migrations (or use the auth generator below).
+Run `pnpm turbo gen database` to add local PostgreSQL 18 (Docker Compose) and a Drizzle ORM `packages/db` workspace. No schema is provided: add your own tables in `packages/db/src/schema/*.ts` before generating migrations (or generate the auth schema as described below).
 
 ```sh
-cp .env.example .env
-docker compose up -d
 pnpm install
-pnpm --filter @repo/db db:generate
-pnpm --filter @repo/db db:migrate
+pnpm env:copy-example
+docker compose up -d
+pnpm db:generate
+pnpm db:migrate
 ```
 
 The database package is for server-side use and is not connected to the Vite browser app. Supply `DATABASE_URL` to any server process that imports it.
@@ -38,21 +48,26 @@ The PostgreSQL 18 image mounts its volume at `/var/lib/postgresql` rather than `
 
 ## Optional authentication
 
-Run `pnpm turbo gen database` first, then `pnpm turbo gen auth` to add `@repo/auth`, the Better Auth schema in `@repo/db`, a mountable OpenAPI REST `@repo/api` package, a thin `apps/api` host, and login/signup in `apps/web`. The auth generator refuses to run without the database package or overwrite existing auth/API packages and web auth UI.
+To start with database, auth, API, and web, run the following from the project root. The auth generator refuses to run without the database package or overwrite existing auth/API packages and web auth UI.
 
 ```sh
+pnpm turbo gen database
+pnpm turbo gen auth
 pnpm install
-cp .env.example .env # if you haven't already
-# Add BETTER_AUTH_SECRET (at least 32 random characters), BETTER_AUTH_URL, and WEB_ORIGIN to .env
+pnpm env:copy-example
+# Set BETTER_AUTH_SECRET (at least 32 random characters) in .env; review DATABASE_URL, BETTER_AUTH_URL, and WEB_ORIGIN.
+pnpm auth:generate-schema
 docker compose up -d
-pnpm --filter @repo/db db:generate
-pnpm --filter @repo/db db:migrate
+pnpm db:generate
+pnpm db:migrate
 pnpm dev
 ```
 
-The auth schema has lowercase plural tables (`users`, `sessions`, `accounts`, `verifications`), snake_case SQL columns, and PostgreSQL `uuid` primary keys defaulting to PostgreSQL 18's `uuidv7()`. Better Auth leaves ID generation to the database. Run the Drizzle migration **before** serving auth requests. Set `DATABASE_URL`, `BETTER_AUTH_SECRET`, and `BETTER_AUTH_URL` in the server process. Do not commit `.env`.
+Copy `.env.example` after both generators so `.env` includes all generated variables. `env:copy-example` does not overwrite an existing `.env`; edit it manually if you generated auth after copying. `pnpm env:run <command>` runs a command with root `.env` loaded, and `pnpm env:remove` deletes the local `.env`. `pnpm auth:generate-schema` uses the pinned Better Auth 1.7.6 CLI to generate `packages/db/src/schema/auth.ts` from `packages/auth/src/schema.config.ts`, replacing that generated file on subsequent runs. The root `db:generate`, `db:migrate`, and `db:studio` scripts delegate to `@repo/db` (and are available after generating the database workspace). `db:generate` creates SQL migrations in `packages/db/drizzle/` from `packages/db/src/schema/*.ts`; `db:migrate` applies them to `DATABASE_URL`. The API loads `.env` itself on startup.
 
-The schema is supplied by the generator, not by `auth generate`: that command may replace native UUID columns and UUIDv7 defaults with text IDs. When adding Better Auth plugins, update `packages/db/src/schema/auth.ts` to include their fields/tables before running Drizzle migrations.
+The generated auth schema has plural table names (`users`, `sessions`, `accounts`, `verifications`, and plural plugin tables), snake_case SQL columns, and PostgreSQL `uuid` primary keys defaulting to `pg_catalog.gen_random_uuid()`. Better Auth leaves ID generation to PostgreSQL. The CLI and runtime share `usePlural: true`; joins are enabled and the CLI-generated Drizzle relations are passed to both Drizzle and the Better Auth adapter. Run the Drizzle migration **before** serving auth requests. Set `DATABASE_URL`, `BETTER_AUTH_SECRET`, and `BETTER_AUTH_URL` in the server process. Do not commit `.env`.
+
+Add schema-affecting Better Auth plugins to `authOptions.plugins` in `packages/auth/src/schema.config.ts` so the CLI and runtime use the same configuration. After changing plugins or auth options, run `pnpm auth:generate-schema`, `pnpm db:generate`, and `pnpm db:migrate` again. Do not hand-edit `packages/db/src/schema/auth.ts`: regeneration replaces it. Add other application tables in separate files under `packages/db/src/schema/`.
 
 `@repo/auth` exports a framework-neutral `auth` instance and framework entry points. Add `@repo/auth: workspace:*` to the consuming server app and mount `/api/auth/*` there:
 

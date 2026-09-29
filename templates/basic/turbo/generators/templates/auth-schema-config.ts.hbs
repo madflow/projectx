@@ -1,0 +1,20 @@
+import { drizzleAdapter } from "@better-auth/drizzle-adapter";
+import { pool } from "@repo/db";
+import { betterAuth, type BetterAuthOptions } from "better-auth";
+import { drizzle } from "drizzle-orm/node-postgres";
+
+export const adapterOptions = { provider: "pg" as const, usePlural: true };
+
+// Configure schema-affecting plugins here so the CLI and runtime share them.
+const authOptions: BetterAuthOptions = {
+  // The CLI can generate the schema before it exists; the runtime supplies the generated schema.
+  database: drizzleAdapter(drizzle(pool), adapterOptions),
+  emailAndPassword: { enabled: true },
+  trustedOrigins: process.env.WEB_ORIGIN ? [process.env.WEB_ORIGIN] : [],
+  // Schema validation runs on the runtime adapter after the schema is generated.
+  advanced: { database: { generateId: "uuid", joins: true, validateSchema: false } },
+  plugins: [],
+};
+
+// The schema CLI imports this instance without importing the generated schema.
+export const auth = betterAuth(authOptions);

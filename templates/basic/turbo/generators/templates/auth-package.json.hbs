@@ -10,6 +10,7 @@
     "./react": "./src/react.ts"
   },
   "scripts": {
+    "auth:generate-schema": "auth generate --config src/schema.config.ts --output ../db/src/schema/auth.ts --yes",
     "lint": "oxlint -c ../../.oxlintrc.json . --deny-warnings",
     "check-types": "tsc --noEmit"
   },
@@ -23,6 +24,7 @@
   "devDependencies": {
     "@types/node": "26.6.3",
     "@types/react": "19.3.0",
+    "auth": "1.7.6",
     "typescript": "7.0.2"
   }
 }
