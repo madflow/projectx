@@ -1,0 +1,44 @@
+:root {
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #213547;
+  background: #fff;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  display: grid;
+  place-items: center;
+}
+
+main {
+  padding: 2rem;
+  text-align: center;
+}
+
+button {
+  margin: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border: 1px solid #747bff;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #f2f2ff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color: #f5f5f5;
+    background: #242424;
+  }
+
+  button:hover {
+    background: #353550;
+  }
+}

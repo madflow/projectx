@@ -1,0 +1,24 @@
+# Dependencies and package-manager artifacts
+node_modules/
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Generated output and caches
+.turbo/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+.vercel/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+
+# Logs and OS files
+*.log
+.DS_Store

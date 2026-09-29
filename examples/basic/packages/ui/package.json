@@ -1,0 +1,22 @@
+{
+  "name": "@repo/ui",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./*": "./src/*.tsx"
+  },
+  "scripts": {
+    "lint": "oxlint -c ../../.oxlintrc.json . --deny-warnings",
+    "generate:component": "turbo gen react-component",
+    "check-types": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "26.6.3",
+    "@types/react": "19.3.0",
+    "typescript": "7.0.2"
+  },
+  "dependencies": {
+    "react": "19.3.0"
+  }
+}

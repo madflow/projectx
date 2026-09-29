@@ -1,0 +1,34 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "typescript", "unicorn", "oxc", "react"],
+  "jsPlugins": [
+    { "name": "hooks-js", "specifier": "eslint-plugin-react-hooks" },
+    "eslint-plugin-turbo"
+  ],
+  "ignorePatterns": ["**/dist/**", "**/build/**"],
+  "rules": {
+    "turbo/no-undeclared-env-vars": "warn",
+    "hooks-js/rules-of-hooks": "error",
+    "hooks-js/exhaustive-deps": "warn",
+    "hooks-js/static-components": "error",
+    "hooks-js/use-memo": "error",
+    "hooks-js/preserve-manual-memoization": "error",
+    "hooks-js/incompatible-library": "warn",
+    "hooks-js/immutability": "error",
+    "hooks-js/globals": "error",
+    "hooks-js/refs": "error",
+    "hooks-js/set-state-in-effect": "error",
+    "hooks-js/error-boundaries": "error",
+    "hooks-js/purity": "error",
+    "hooks-js/set-state-in-render": "error",
+    "hooks-js/unsupported-syntax": "warn",
+    "hooks-js/config": "error",
+    "hooks-js/gating": "error"
+  },
+  "overrides": [
+    {
+      "files": ["apps/web/**", "packages/ui/**"],
+      "env": { "browser": true, "serviceworker": true }
+    }
+  ]
+}
