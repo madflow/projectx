@@ -1,10 +1,11 @@
 import { Login01 } from "@repo/ui/features/login-01";
-import { Signup01 } from "@repo/ui/features/signup-01";
 import { Sidebar07, Sidebar07Item } from "@repo/ui/features/sidebar-07";
-import { ThemeProvider } from "./components/theme-provider";
-import { ThemeToggle } from "./components/theme-toggle";
+import { Signup01 } from "@repo/ui/features/signup-01";
 import { expect, test, vi } from "vitest";
 import { render } from "vitest-browser-react";
+
+import { ThemeProvider } from "./components/theme-provider";
+import { ThemeToggle } from "./components/theme-toggle";
 
 test("login form sends credentials to its consumer", async () => {
   const onSubmit = vi.fn();
@@ -13,6 +14,28 @@ test("login form sends credentials to its consumer", async () => {
   await screen.getByLabelText("Password").fill("password123");
   await screen.getByRole("button", { name: "Login" }).click();
   expect(onSubmit).toHaveBeenCalledWith({ email: "test@example.com", password: "password123" });
+});
+
+test("login block exposes working links and an optional Google action", async () => {
+  const onSignupClick = vi.fn();
+  const onForgotPasswordClick = vi.fn();
+  const onGoogleLogin = vi.fn();
+  const screen = await render(
+    <Login01
+      onSubmit={vi.fn()}
+      onSignupClick={onSignupClick}
+      onForgotPasswordClick={onForgotPasswordClick}
+      onGoogleLogin={onGoogleLogin}
+    />,
+  );
+
+  await screen.getByRole("button", { name: "Sign up" }).click();
+  await screen.getByRole("button", { name: "Forgot your password?" }).click();
+  await screen.getByRole("button", { name: "Login with Google" }).click();
+
+  expect(onSignupClick).toHaveBeenCalledOnce();
+  expect(onForgotPasswordClick).toHaveBeenCalledOnce();
+  expect(onGoogleLogin).toHaveBeenCalledOnce();
 });
 
 test("signup form rejects mismatched passwords", async () => {

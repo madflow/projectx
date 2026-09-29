@@ -16,26 +16,34 @@ import {
   FieldLabel,
 } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
-import { cn } from "@repo/ui/lib/utils";
+import { cn } from "cn";
 import { useId, type FormEvent } from "react";
 
 export type LoginValues = { email: string; password: string };
 
-export function Login01({
-  onSubmit,
-  pending = false,
-  error,
-  signupHref,
-  forgotPasswordHref,
-  className,
-}: {
+type LoginFormProps = Omit<React.ComponentProps<"div">, "onSubmit"> & {
   onSubmit: (values: LoginValues) => void | Promise<void>;
   pending?: boolean;
   error?: string | null;
   signupHref?: string;
   forgotPasswordHref?: string;
-  className?: string;
-}) {
+  onSignupClick?: () => void;
+  onForgotPasswordClick?: () => void;
+  onGoogleLogin?: () => void | Promise<void>;
+};
+
+export function LoginForm({
+  onSubmit,
+  pending = false,
+  error,
+  signupHref,
+  forgotPasswordHref,
+  onSignupClick,
+  onForgotPasswordClick,
+  onGoogleLogin,
+  className,
+  ...props
+}: LoginFormProps) {
   const id = useId();
 
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -45,7 +53,7 @@ export function Login01({
   }
 
   return (
-    <div className={cn("flex flex-col gap-6", className)}>
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>
@@ -77,6 +85,15 @@ export function Login01({
                       Forgot your password?
                     </a>
                   )}
+                  {!forgotPasswordHref && onForgotPasswordClick && (
+                    <button
+                      type="button"
+                      className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                      onClick={onForgotPasswordClick}
+                    >
+                      Forgot your password?
+                    </button>
+                  )}
                 </div>
                 <Input
                   id={`${id}-password`}
@@ -92,9 +109,30 @@ export function Login01({
                 <Button type="submit" disabled={pending}>
                   Login
                 </Button>
-                {signupHref && (
+                {onGoogleLogin && (
+                  <Button
+                    variant="outline"
+                    type="button"
+                    disabled={pending}
+                    onClick={onGoogleLogin}
+                  >
+                    Login with Google
+                  </Button>
+                )}
+                {(signupHref || onSignupClick) && (
                   <FieldDescription className="text-center">
-                    Don&apos;t have an account? <a href={signupHref}>Sign up</a>
+                    Don&apos;t have an account?{" "}
+                    {signupHref ? (
+                      <a href={signupHref}>Sign up</a>
+                    ) : (
+                      <button
+                        type="button"
+                        className="underline underline-offset-4 hover:text-primary"
+                        onClick={onSignupClick}
+                      >
+                        Sign up
+                      </button>
+                    )}
                   </FieldDescription>
                 )}
               </Field>
@@ -105,3 +143,5 @@ export function Login01({
     </div>
   );
 }
+
+export { LoginForm as Login01 };

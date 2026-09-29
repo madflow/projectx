@@ -3,6 +3,7 @@ import { pool } from "@repo/db";
 import * as schema from "@repo/db/schema/auth";
 import { betterAuth, type BetterAuthPlugin } from "better-auth";
 import { drizzle } from "drizzle-orm/node-postgres";
+
 import { adapterOptions, auth as schemaAuth } from "./schema.config.js";
 
 const db = drizzle(pool, { schema });

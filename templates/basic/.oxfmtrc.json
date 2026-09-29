@@ -1,1 +1,7 @@
-{}
+{
+  "sortImports": true,
+  "sortTailwindcss": {
+    "stylesheet": "packages/ui/src/styles/globals.css",
+    "functions": ["cn", "cva"]
+  }
+}

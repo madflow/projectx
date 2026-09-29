@@ -25,12 +25,14 @@ export function Signup01({
   pending = false,
   error,
   loginHref,
+  onLoginClick,
   className,
 }: {
   onSubmit: (values: SignupValues) => void | Promise<void>;
   pending?: boolean;
   error?: string | null;
   loginHref?: string;
+  onLoginClick?: () => void;
   className?: string;
 }) {
   const id = useId();
@@ -117,9 +119,20 @@ export function Signup01({
               <Button type="submit" disabled={pending}>
                 Create Account
               </Button>
-              {loginHref && (
+              {(loginHref || onLoginClick) && (
                 <FieldDescription className="px-6 text-center">
-                  Already have an account? <a href={loginHref}>Sign in</a>
+                  Already have an account?{" "}
+                  {loginHref ? (
+                    <a href={loginHref}>Sign in</a>
+                  ) : (
+                    <button
+                      type="button"
+                      className="underline underline-offset-4 hover:text-primary"
+                      onClick={onLoginClick}
+                    >
+                      Sign in
+                    </button>
+                  )}
                 </FieldDescription>
               )}
             </Field>

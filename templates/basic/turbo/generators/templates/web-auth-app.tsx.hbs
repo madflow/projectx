@@ -6,10 +6,11 @@ import {
   useSignOut,
   useSignUpEmail,
 } from "@repo/auth/react";
+import { Button } from "@repo/ui/components/button";
 import { Login01, type LoginValues } from "@repo/ui/features/login-01";
 import { Signup01, type SignupValues } from "@repo/ui/features/signup-01";
-import { Button } from "@repo/ui/components/button";
 import { useState } from "react";
+
 import { ThemeToggle } from "./components/theme-toggle";
 
 const client = createAuthClient();
@@ -88,9 +89,19 @@ function AuthContent() {
       {sessionError && <p role="alert">{sessionError.message}</p>}
       <div className="w-full max-w-sm">
         {register ? (
-          <Signup01 onSubmit={signup} pending={signUp.isPending} error={signUp.error?.message} />
+          <Signup01
+            onSubmit={signup}
+            pending={signUp.isPending}
+            error={signUp.error?.message}
+            onLoginClick={() => setRegister(false)}
+          />
         ) : (
-          <Login01 onSubmit={login} pending={signIn.isPending} error={signIn.error?.message} />
+          <Login01
+            onSubmit={login}
+            pending={signIn.isPending}
+            error={signIn.error?.message}
+            onSignupClick={() => setRegister(true)}
+          />
         )}
       </div>
     </main>

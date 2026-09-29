@@ -1,7 +1,9 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { ThemeProvider } from "./components/theme-provider";
+
 import App from "./App";
+import { ThemeProvider } from "./components/theme-provider";
+
 import "@repo/ui/globals.css";
 
 createRoot(document.getElementById("root")!).render(

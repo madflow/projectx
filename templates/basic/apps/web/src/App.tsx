@@ -1,4 +1,5 @@
 import { Button } from "@repo/ui/components/button";
+
 import { ThemeToggle } from "./components/theme-toggle";
 
 export default function App() {

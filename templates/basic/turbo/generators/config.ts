@@ -1,5 +1,6 @@
-import type { PlopTypes } from "@turbo/gen";
 import { existsSync, readFileSync } from "node:fs";
+
+import type { PlopTypes } from "@turbo/gen";
 
 export default function generator(plop: PlopTypes.NodePlopAPI): void {
   plop.setGenerator("database", {
@@ -45,6 +46,7 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
         );
       }
       const starterApp = `import { Button } from "@repo/ui/components/button";
+
 import { ThemeToggle } from "./components/theme-toggle";
 
 export default function App() {

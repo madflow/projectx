@@ -32,6 +32,8 @@ To add shared shadcn components, run `pnpm dlx shadcn@latest add <component> -c 
 
 The root scripts use Turborepo to run tasks across the workspace.
 
+`pnpm format` and `pnpm format:check` use Oxfmt to sort imports and Tailwind v4 classes against `packages/ui/src/styles/globals.css`. They also format/check the TypeScript generator templates (`*.ts.hbs` and `*.tsx.hbs`) as generated files and verify that the auth generator's starter-app guard matches `apps/web/src/App.tsx`.
+
 ## Optional database
 
 Run `pnpm turbo gen database` to add local PostgreSQL 18 (Docker Compose) and a Drizzle ORM `packages/db` workspace. No schema is provided: add your own tables in `packages/db/src/schema/*.ts` before generating migrations (or generate the auth schema as described below).
@@ -52,7 +54,7 @@ The PostgreSQL 18 image mounts its volume at `/var/lib/postgresql` rather than `
 
 ## UI feature blocks
 
-`@repo/ui` exports styled, framework-neutral blocks at `@repo/ui/features/login-01`, `@repo/ui/features/signup-01`, and `@repo/ui/features/sidebar-07`. The blocks adapt the upstream shadcn `base-lyra` layouts with unmodified shadcn primitives in `packages/ui/src/components/`, using Tailwind classes instead of a separate feature stylesheet. The login and signup forms require an `onSubmit` callback and accept optional `pending`, `error`, and navigation-link props; wire them to `@repo/auth/react` in the consuming app. `Sidebar07` accepts `navigation`, `header`, `footer`, and page `children`; use `Sidebar07Item` for icon-collapsing links. It uses the shadcn sidebar's mobile sheet and remembers desktop collapse state in a cookie. These blocks do not create routes, supply sample data, or enable social login.
+`@repo/ui` exports styled, framework-neutral blocks at `@repo/ui/features/login-01`, `@repo/ui/features/signup-01`, and `@repo/ui/features/sidebar-07`. The blocks adapt the upstream shadcn `base-lyra` layouts with unmodified shadcn primitives in `packages/ui/src/components/`, using Tailwind classes instead of a separate feature stylesheet. The login and signup forms require an `onSubmit` callback and accept optional `pending`, `error`, and navigation-link props; wire them to `@repo/auth/react` in the consuming app. `Login01` also exports `LoginForm` and accepts optional `onSignupClick`, `onForgotPasswordClick`, and `onGoogleLogin` callbacks; the Google button appears only when its action is supplied. `Signup01` accepts `onLoginClick` for an in-app switch. `Sidebar07` accepts `navigation`, `header`, `footer`, and page `children`; use `Sidebar07Item` for icon-collapsing links. It uses the shadcn sidebar's mobile sheet and remembers desktop collapse state in a cookie. These blocks do not create routes, supply sample data, or enable social login by default.
 
 ## Optional authentication
 
