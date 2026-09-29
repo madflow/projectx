@@ -8,10 +8,7 @@
     "./components/*": "./src/components/*.tsx",
     "./lib/*": "./src/lib/*.ts",
     "./hooks/*": "./src/hooks/*.ts",
-    "./features/*": "./src/features/*.tsx",
-    "./button": "./src/button.tsx",
-    "./card": "./src/card.tsx",
-    "./code": "./src/code.tsx"
+    "./features/*": "./src/features/*.tsx"
   },
   "scripts": {
     "lint": "oxlint -c ../../.oxlintrc.json . --deny-warnings",
