@@ -1,4 +1,4 @@
-# Turbo starters
+# ProjectX
 
 Each directory under `templates/` is a self-contained Turborepo. `templates/basic` is the current Vite/React starter. Requires Node 24+ and pnpm 12; the optional PostgreSQL 18 feature also requires Docker Compose.
 
