@@ -22,7 +22,7 @@ Install dependencies with `pnpm install`, then run `pnpm dev`. Open http://local
 
 ## Validate and build
 
-- `pnpm check` runs Oxlint and Knip, type checking, and a non-writing formatting check. After adding auth, run `pnpm env:copy-example` and `pnpm auth:generate-schema` first; checks cannot pass until `packages/db/src/schema/auth.ts` exists.
+- `pnpm check` runs Oxlint and Knip, type checking, and a non-writing formatting check. After adding auth, run `pnpm env:init` and `pnpm auth:generate-schema` first; checks cannot pass until `packages/db/src/schema/auth.ts` exists.
 - `pnpm build` builds the Vite app to `apps/web/dist`.
 - `pnpm --filter web preview` previews the production build.
 
@@ -54,17 +54,18 @@ To start with database, auth, API, and web, run the following from the project r
 pnpm turbo gen database
 pnpm turbo gen auth
 pnpm install
-pnpm env:copy-example
-# Set BETTER_AUTH_SECRET (at least 32 random characters) in .env; review DATABASE_URL, BETTER_AUTH_URL, and WEB_ORIGIN.
+# Review the non-secret .env.example defaults before initializing.
+pnpm env:init
 pnpm auth:generate-schema
-pnpm check
-docker compose up -d
 pnpm db:generate
+# Review the generated migration before applying it.
+docker compose up -d
 pnpm db:migrate
+pnpm check
 pnpm dev
 ```
 
-Copy `.env.example` after both generators so `.env` includes all generated variables. `env:copy-example` does not overwrite an existing `.env`; edit it manually if you generated auth after copying. `pnpm env:run <command>` runs a command with root `.env` loaded, and `pnpm env:remove` deletes the local `.env`. `pnpm auth:generate-schema` uses the pinned Better Auth 1.7.6 CLI to generate `packages/db/src/schema/auth.ts` from `packages/auth/src/schema.config.ts`, replacing that generated file on subsequent runs. This is required before `pnpm check`: without it, `@repo/auth` cannot resolve `@repo/db/schema/auth`. Schema generation needs `.env` but not a running database. The root `db:generate`, `db:migrate`, and `db:studio` scripts delegate to `@repo/db` (and are available after generating the database workspace). `db:generate` creates SQL migrations in `packages/db/drizzle/` from `packages/db/src/schema/*.ts`; `db:migrate` applies them to `DATABASE_URL`. The API loads `.env` itself on startup.
+Run `pnpm env:init` only after both generators, after reviewing the non-secret `.env.example` defaults. It creates `.env` from `.env.example` with a random `BETTER_AUTH_SECRET`, without printing it, and refuses to overwrite an existing file. A successful initialization does not require reading `.env` back. The example database credentials are for local development only; if `.env` already exists, verify it rather than rerunning initialization. For a database-only setup, `pnpm env:copy-example` copies the example without generating an auth secret. `pnpm env:run <command>` runs a command with root `.env` loaded, and `pnpm env:remove` deletes the local `.env`. `pnpm auth:generate-schema` uses the pinned Better Auth 1.7.6 CLI to generate `packages/db/src/schema/auth.ts` from `packages/auth/src/schema.config.ts`, replacing that generated file on subsequent runs. This is required before `pnpm check`: without it, `@repo/auth` cannot resolve `@repo/db/schema/auth`. Schema generation needs `.env` but not a running database. The root `db:generate`, `db:migrate`, and `db:studio` scripts delegate to `@repo/db` (and are available after generating the database workspace). `db:generate` creates SQL migrations in `packages/db/drizzle/` from `packages/db/src/schema/*.ts`; `db:migrate` applies them to `DATABASE_URL`. The API loads `.env` itself on startup.
 
 The generated auth schema has plural table names (`users`, `sessions`, `accounts`, `verifications`, and plural plugin tables), snake_case SQL columns, and PostgreSQL `uuid` primary keys defaulting to `pg_catalog.gen_random_uuid()`. Better Auth leaves ID generation to PostgreSQL. The CLI and runtime share `usePlural: true`; joins are enabled and the CLI-generated Drizzle relations are passed to both Drizzle and the Better Auth adapter. Run the Drizzle migration **before** serving auth requests. Set `DATABASE_URL`, `BETTER_AUTH_SECRET`, and `BETTER_AUTH_URL` in the server process. Do not commit `.env`.
 

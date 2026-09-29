@@ -17,11 +17,11 @@ Set up the Vite/React web app, PostgreSQL, Better Auth, and the API. Follow the 
 
    The database generator creates `packages/db`, `compose.yaml`, and `.env.example`. The auth generator adds `packages/auth`, `packages/api`, `apps/api`, the login UI, and the auth variables in `.env.example`. Neither generator needs a yes/no confirmation. Do not rerun them over workspaces that already exist. If starting from an existing project, confirm both generators have already run before proceeding; if auth has not been added, do not treat this as a database-only install. Do not run `pnpm check` yet: auth imports `@repo/db/schema/auth`, which does not exist until step 4 generates it.
 
-3. Set up the local environment only after both generators:
+3. Set up the local environment only after both generators. Review the non-secret `.env.example` defaults first: `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, `DATABASE_URL`, `BETTER_AUTH_URL` (`http://localhost:3000`), and `WEB_ORIGIN` (`http://localhost:5173`). The example database password is for local development only; if these defaults do not suit the project, ask the user to configure their environment instead of proceeding with them. If the defaults are suitable, run:
 
-   pnpm env:copy-example
+   pnpm env:init
 
-   This command does not overwrite an existing `.env`. Ensure it contains `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, and `WEB_ORIGIN`. For the default local setup, `BETTER_AUTH_URL` is `http://localhost:3000` and `WEB_ORIGIN` is `http://localhost:5173`. Set `BETTER_AUTH_SECRET` to a cryptographically random value of at least 32 characters, without showing it in logs or committing `.env`. If `.env` already exists, preserve it and add missing values with the user's approval. If access to `.env` is blocked, do not try to inspect it by another route; ask the user to configure or verify it and stop until they confirm it is ready. Do not start the API with unverified settings.
+   On a fresh project, this command copies `.env.example` to `.env` and fills `BETTER_AUTH_SECRET` with a cryptographically random value without printing it. It refuses to overwrite an existing `.env`. A successful command is sufficient to continue with the reviewed example defaults; do not read back `.env` just to confirm the secret. If `.env` already exists, do not rerun initialization or overwrite it; ask the user to verify its values and secret (at least 32 random characters) without sharing the secret. If `env:init` fails or access to `.env` is explicitly blocked, stop. Do not try another tool or script to inspect or modify it; ask the user to configure or verify it and wait for confirmation. Never print or commit `.env`. Do not start the API with unverified settings.
 
 4. First generate the Drizzle auth schema from the Better Auth configuration:
 
