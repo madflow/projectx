@@ -1,5 +1,5 @@
 {
   "name": "Basic",
   "description": "Basic monorepo example with a Vite React application",
-  "maintainedByCoreTeam": true
+  "maintainedByCoreTeam": false
 }
